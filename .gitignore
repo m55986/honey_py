@@ -3,3 +3,4 @@ server.key.pub
 audits.log
 cmd_audits.log
 http_audits.log
+__pycache__/
