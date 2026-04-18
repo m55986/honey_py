@@ -45,7 +45,7 @@ def emulated_shell(channel, client_ip):
                 channel.close()
             elif command.strip() == b'pwd': #Print working directory.
                 response = b'\n' + b'\n\\usr\\local' + b'\r\n'
-                creds_logger.info(f'Command {command.strip()}' + 'executed by ' + f'{client_ip}')
+                creds_logger.info(f'Command {command.strip()}' + 'executed by ' + f'{client_ip}') #Log all commands used by hack under all elif statements.
             elif command.strip() == b'whoami': #Print username.
                 response = b'\n' + b"corpuser1" + b'\r\n'
                 creds_logger.info(f'Command {command.strip()}' + 'executed by ' + f'{client_ip}')
@@ -76,12 +76,12 @@ class Server(paramiko.ServerInterface):
         if kind == 'session':
             return paramiko.OPEN_SUCCEEDED #If the channel type is session then open connection.
         
-    def get_allowed_auths(self):
+    def get_allowed_auths(self, username):
         return 'password' #Basic auth(SSH can support more)
     
     def check_auth_password(self, username, password): #Default username password
-        funnel_logger.info(f'Client {self.client_ip} attempted connection with ' + f'username: {username}' + f'password: {password}')
-        creds_logger.info(f'{self.client_ip}, {username}, {password}')
+        funnel_logger.info(f'Client {self.client_ip} attempted connection with ' + f'username: {username}' + f', password: {password}') #Create log file
+        creds_logger.info(f'{self.client_ip}, {username}, {password}') #Add to creds logger for context.
         if self.input_username is not None and self.input_password is not None:
             if username == self.input_username and password == self.input_password: #Any username/password accepted.
                 return paramiko.AUTH_SUCCESSFUL
@@ -113,7 +113,8 @@ def client_handler(client, addr, username, password):
         transport.add_server_key(host_key) #Pass in ssh session into server class. #Host key is public private key pair which allows incoming connection/clients to verify that the server is who they say they are.
         transport.start_server(server=server)
 
-        channel = transport.accept(100) #Wait 100 miliseconds for client to open channel.
+        channel = transport.accept(100) #Wait 100 seconds? for client to open channel.
+
         if channel is None: #If client does not establish channel connection.
             print('No channel was opened.')
         
@@ -151,4 +152,4 @@ def honeypot(address, port, username, password): #Main function to be interfacti
             print(error)
             print('Error accepting client connection!')
 
-honeypot('127.0.0.1', 2223, 'username', 'password')
+honeypot('127.0.0.1', 2223, username=None, password=None) #'(...,'username', 'password') -> any username/password accepted
