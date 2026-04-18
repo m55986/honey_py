@@ -1,7 +1,5 @@
-static/server.key
-static/server.key.pub
-assets/images/top10cmd.png
-assets/images/top10creds.png
-Docker/
-__pycache__
-requirements1.txt
+server.key
+server.key.pub
+audits.log
+cmd_audits.log
+http_audits.log
